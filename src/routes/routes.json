@@ -1,0 +1,27 @@
+[
+  {
+    "path": "/",
+    "element": "Dashboard",
+    "auth": true
+  },
+  {
+    "path": "/dashboard",
+    "element": "Dashboard",
+    "auth": true
+  },
+  {
+    "path": "/users",
+    "element": "UserManagement",
+    "auth": true
+  },
+  {
+    "path": "/products",
+    "element": "ProductManagement",
+    "auth": true
+  },
+  {
+    "path": "/login",
+    "element": "Login",
+    "auth": false
+  }
+] 

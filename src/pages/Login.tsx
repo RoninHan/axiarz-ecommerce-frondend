@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { observer } from 'mobx-react-lite';
 import { useUserStore } from '../stores/StoreProvider';
+import { userApi } from '../api/services';
 
 // 图形验证码组件
 interface CaptchaProps {
@@ -212,7 +213,7 @@ const Captcha: React.FC<CaptchaProps> = ({ value, onChange, onRefresh, error }) 
 export const Login: React.FC = observer(() => {
   const userStore = useUserStore();
   const [formData, setFormData] = useState({
-    username: '',
+    email: '',
     password: '',
     captcha: '',
     rememberMe: false
@@ -244,13 +245,15 @@ export const Login: React.FC = observer(() => {
 
     try {
       // 验证表单
-      if (!formData.username || !formData.password || !formData.captcha) {
+      if (!formData.email || !formData.password || !formData.captcha) {
         setError('请填写所有必填字段');
         return;
       }
 
       // 模拟登录请求
-      await new Promise(resolve => setTimeout(resolve, 1500));
+     const data = await userApi.login(formData);
+     console.log(data)
+     alert(1)
 
       // 模拟验证码验证
       if (formData.captcha.toUpperCase() !== 'ABCD') {
@@ -259,23 +262,14 @@ export const Login: React.FC = observer(() => {
         return;
       }
 
-      // 模拟用户数据
-      const mockUser = {
-        id: '1',
-        username: formData.username,
-        email: `${formData.username}@example.com`,
-        role: 'admin',
-        avatar: ''
-      };
-
-      const mockToken = 'mock-token-' + Date.now();
+      // 模拟
 
       // 登录成功
-      userStore.login(mockUser, mockToken);
+      // userStore.login(mockUser, mockToken);
 
       // 如果记住我，保存用户名
       if (formData.rememberMe) {
-        localStorage.setItem('rememberedUsername', formData.username);
+        localStorage.setItem('rememberedUsername', formData.email);
       } else {
         localStorage.removeItem('rememberedUsername');
       }
@@ -296,7 +290,7 @@ export const Login: React.FC = observer(() => {
     if (rememberedUsername) {
       setFormData(prev => ({
         ...prev,
-        username: rememberedUsername,
+        email: rememberedUsername,
         rememberMe: true
       }));
     }
@@ -341,16 +335,16 @@ export const Login: React.FC = observer(() => {
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 <TextField
                   fullWidth
-                  label="用户名"
-                  value={formData.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
+                  label="邮件"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
                   size="medium"
-                  error={!!error && !formData.username}
-                  helperText={error && !formData.username ? "请输入用户名" : ""}
+                  error={!!error && !formData.email}
+                  helperText={error && !formData.email ? "请输入用户名" : ""}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Person sx={{ fontSize: 20, color: error && !formData.username ? 'error.main' : 'inherit' }} />
+                        <Person sx={{ fontSize: 20, color: error && !formData.email ? 'error.main' : 'inherit' }} />
                       </InputAdornment>
                     ),
                   }}
