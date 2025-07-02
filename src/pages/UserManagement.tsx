@@ -168,9 +168,9 @@ export const UserManagement: React.FC = () => {
   const [selectedUsers, setSelectedUsers] = useState<(string | number)[]>([]);
   const [bulkActionDialog, setBulkActionDialog] = useState(false);
 
-    // 分页处理
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+  // 分页处理
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // 处理筛选
   const handleFilter = (filters: FilterCondition[]) => {
@@ -314,7 +314,7 @@ export const UserManagement: React.FC = () => {
 
   const handlePageSizeChange = (newPageSize: number) => {
     setPageSize(newPageSize);
-    setPage(0);
+    setPage(1);
   };
 
   // 选择处理

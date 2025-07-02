@@ -26,15 +26,15 @@
     "element": "ProductManagement",
     "auth": true,
     "menu": true,
-    "title": "商品管理",
-    "icon": "Inventory"
+    "title": "產品管理",
+    "icon": "Category"
   },
   {
-    "path": "/product-crud",
-    "element": "ProductCRUD",
+    "path": "/categories",
+    "element": "CategoryManagement",
     "auth": true,
     "menu": true,
-    "title": "产品增删改查",
+    "title": "產品類型管理",
     "icon": "Category"
   },
   {

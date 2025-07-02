@@ -30,25 +30,25 @@ export const userApi = {
 // 商品相关 API
 export const productApi = {
   // 获取商品列表
-  getProducts: (params?: any) => axios.get('/products', { params }),
+  getProducts: (params?: any) => axios.get('/api/product/get', { params }),
   
   // 获取商品详情
-  getProduct: (id: string) => axios.get(`/products/${id}`),
+  getProduct: (id: string) => axios.get(`/api/product/get/${id}`),
   
   // 创建商品
-  createProduct: (data: any) => axios.post('/products', data),
+  createProduct: (data: any) => axios.post('/api/product/create', data),
   
   // 更新商品
-  updateProduct: (id: string, data: any) => axios.put(`/products/${id}`, data),
+  updateProduct: (id: string, data: any) => axios.post(`/api/product/update/${id}`, data),
   
   // 删除商品
-  deleteProduct: (id: string) => axios.delete(`/products/${id}`),
+  deleteProduct: (id: string) => axios.delete(`/api/product/delete/${id}`),
   
   // 获取商品分类
-  getCategories: () => axios.get('/products/categories'),
+  getCategories: () => axios.get('/api/category/get'),
   
   // 创建商品分类
-  createCategory: (data: any) => axios.post('/products/categories', data),
+  createCategory: (data: any) => axios.post('/api/category/create', data),
 };
 
 // 订单相关 API
@@ -120,3 +120,16 @@ export const settingsApi = {
   // 恢复数据
   restoreData: (data: any) => axios.post('/settings/restore', data),
 }; 
+
+export const bannerApi = {
+  // 获取横幅列表
+  getBanners: (params?: any) => axios.get('/banners', { params }),
+  // 創建横幅
+  createBanner: (data: any) => axios.post('/banners', data),
+  // 更新横幅
+  updateBanner: (id: string, data: any) => axios.put(`/banners/${id}`, data),
+  // 删除横幅
+  deleteBanner: (id: string) => axios.delete(`/banners/${id}`),
+  // 获取横幅详情
+  getBanner: (id: string) => axios.get(`/banners/${id}`),
+}

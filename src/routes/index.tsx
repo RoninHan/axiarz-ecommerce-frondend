@@ -4,19 +4,26 @@ import routes from './routes.json';
 import { Dashboard } from '../pages/Dashboard';
 import { UserManagement } from '../pages/UserManagement';
 import { ProductManagement } from '../pages/ProductManagement';
-import ProductCRUD from '../pages/ProductCRUD';
 import { Login } from '../pages/Login';
 import { MainLayout } from '../layouts/MainLayout';
 import { useUserStore } from '../stores/StoreProvider';
+import { CategoryManagement } from '../pages/CategoryManagement';
 
 const elementMap: Record<string, React.ReactNode> = {
   Dashboard: <Dashboard />,
   UserManagement: <UserManagement />,
   ProductManagement: <ProductManagement />,
-  ProductCRUD: <ProductCRUD />,
   Login: <Login />,
+  CategoryManagement: <CategoryManagement />,
 };
 
+/**
+ * A higher-order component that wraps children components and redirects to login page
+ * if the user is not authenticated. Uses the user store to check authentication status.
+ * 
+ * @param children - The child components to render if authenticated
+ * @returns Either the children components or a redirect to login page
+ */
 function RequireAuth({ children }: { children: JSX.Element }) {
   const userStore = useUserStore();
   if (!userStore.isAuthenticated) {
