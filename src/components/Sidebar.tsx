@@ -6,185 +6,28 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Divider,
-  Box,
-  Typography,
-  Collapse
+  Box
 } from '@mui/material';
-import {
-  Dashboard,
-  People,
-  Inventory,
-  ShoppingCart,
-  Assessment,
-  Settings,
-  ExpandLess,
-  ExpandMore,
-  Store,
-  Category,
-  LocalShipping,
-  Payment
-} from '@mui/icons-material';
+import * as MuiIcons from '@mui/icons-material';
 import { observer } from 'mobx-react-lite';
 import { useAppStore } from '../stores/StoreProvider';
+import routes from '../routes/routes.json';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
 
-// 菜单项接口
-interface MenuItem {
-  id: string;
-  title: string;
-  icon: React.ReactNode;
-  path: string;
-  children?: MenuItem[];
-}
-
-// 菜单配置
-const menuItems: MenuItem[] = [
-  {
-    id: 'dashboard',
-    title: '仪表盘',
-    icon: <Dashboard />,
-    path: '/dashboard'
-  },
-  {
-    id: 'users',
-    title: '用户管理',
-    icon: <People />,
-    path: '/users'
-  },
-  {
-    id: 'products',
-    title: '商品管理',
-    icon: <Inventory />,
-    path: '/products',
-    children: [
-      {
-        id: 'product-list',
-        title: '商品列表',
-        icon: <Category />,
-        path: '/products/list'
-      },
-      {
-        id: 'product-categories',
-        title: '商品分类',
-        icon: <Category />,
-        path: '/products/categories'
-      }
-    ]
-  },
-  {
-    id: 'orders',
-    title: '订单管理',
-    icon: <ShoppingCart />,
-    path: '/orders',
-    children: [
-      {
-        id: 'order-list',
-        title: '订单列表',
-        icon: <ShoppingCart />,
-        path: '/orders/list'
-      },
-      {
-        id: 'order-shipping',
-        title: '物流管理',
-        icon: <LocalShipping />,
-        path: '/orders/shipping'
-      }
-    ]
-  },
-  {
-    id: 'customers',
-    title: '客户管理',
-    icon: <People />,
-    path: '/customers'
-  },
-  {
-    id: 'analytics',
-    title: '数据分析',
-    icon: <Assessment />,
-    path: '/analytics'
-  },
-  {
-    id: 'payments',
-    title: '支付管理',
-    icon: <Payment />,
-    path: '/payments'
-  },
-  {
-    id: 'settings',
-    title: '系统设置',
-    icon: <Settings />,
-    path: '/settings'
-  }
-];
+// 只保留menu为true的路由
+const menuRoutes = routes.filter((r: any) => r.menu);
 
 export const Sidebar: React.FC = observer(() => {
   const appStore = useAppStore();
-  const [expandedItems, setExpandedItems] = React.useState<Set<string>>(new Set());
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleItemClick = (item: MenuItem) => {
-    if (item.children) {
-      const newExpanded = new Set(expandedItems);
-      if (newExpanded.has(item.id)) {
-        newExpanded.delete(item.id);
-      } else {
-        newExpanded.add(item.id);
-      }
-      setExpandedItems(newExpanded);
-    } else {
-      // 处理导航
-      console.log('Navigate to:', item.path);
-      // 使用全局导航函数
-      if ((window as any).navigate) {
-        (window as any).navigate(item.path);
-      }
+  const handleItemClick = (path: string) => {
+    if (location.pathname !== path) {
+      navigate(path);
     }
-  };
-
-  const renderMenuItem = (item: MenuItem, level: number = 0) => {
-    const isExpanded = expandedItems.has(item.id);
-    const hasChildren = item.children && item.children.length > 0;
-
-    return (
-      <React.Fragment key={item.id}>
-        <ListItem disablePadding>
-          <ListItemButton
-            onClick={() => handleItemClick(item)}
-            sx={{
-              pl: level * 2 + 2,
-              minHeight: 48,
-              justifyContent: appStore.sidebarCollapsed ? 'center' : 'initial',
-              px: 2.5,
-            }}
-          >
-            <ListItemIcon
-              sx={{
-                minWidth: 0,
-                mr: appStore.sidebarCollapsed ? 0 : 3,
-                justifyContent: 'center',
-              }}
-            >
-              {item.icon}
-            </ListItemIcon>
-            {!appStore.sidebarCollapsed && (
-              <>
-                <ListItemText primary={item.title} />
-                {hasChildren && (isExpanded ? <ExpandLess /> : <ExpandMore />)}
-              </>
-            )}
-          </ListItemButton>
-        </ListItem>
-        
-        {hasChildren && !appStore.sidebarCollapsed && (
-          <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {item.children!.map(child => renderMenuItem(child, level + 1))}
-            </List>
-          </Collapse>
-        )}
-      </React.Fragment>
-    );
   };
 
   return (
@@ -205,7 +48,35 @@ export const Sidebar: React.FC = observer(() => {
     >
       <Box sx={{ overflow: 'auto', mt: 8 }}>
         <List>
-          {menuItems.map(item => renderMenuItem(item))}
+          {menuRoutes.map((item: any) => {
+            const Icon = item.icon && (MuiIcons as any)[item.icon];
+            return (
+              <ListItem key={item.path} disablePadding>
+                <ListItemButton
+                  selected={location.pathname === item.path}
+                  onClick={() => handleItemClick(item.path)}
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: appStore.sidebarCollapsed ? 'center' : 'initial',
+                    px: 2.5,
+                  }}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: appStore.sidebarCollapsed ? 0 : 3,
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {Icon ? <Icon /> : null}
+                  </ListItemIcon>
+                  {!appStore.sidebarCollapsed && (
+                    <ListItemText primary={item.title} />
+                  )}
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
       </Box>
     </Drawer>

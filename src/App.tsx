@@ -6,7 +6,7 @@ export const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <RenderRoutes />
+        {RenderRoutes()}
       </Routes>
     </BrowserRouter>
   );

@@ -4,6 +4,7 @@ import routes from './routes.json';
 import { Dashboard } from '../pages/Dashboard';
 import { UserManagement } from '../pages/UserManagement';
 import { ProductManagement } from '../pages/ProductManagement';
+import ProductCRUD from '../pages/ProductCRUD';
 import { Login } from '../pages/Login';
 import { MainLayout } from '../layouts/MainLayout';
 import { useUserStore } from '../stores/StoreProvider';
@@ -12,6 +13,7 @@ const elementMap: Record<string, React.ReactNode> = {
   Dashboard: <Dashboard />,
   UserManagement: <UserManagement />,
   ProductManagement: <ProductManagement />,
+  ProductCRUD: <ProductCRUD />,
   Login: <Login />,
 };
 

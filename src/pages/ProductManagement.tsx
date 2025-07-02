@@ -21,6 +21,7 @@ import {
   LocalOffer
 } from '@mui/icons-material';
 import { DataTable, DataItem, ColumnConfig, FilterCondition } from '../components/DataTable';
+import moment from 'moment';
 
 // 模拟商品数据
 const mockProducts: DataItem[] = [
@@ -250,7 +251,8 @@ const columns: ColumnConfig[] = [
     label: '创建时间',
     editable: false,
     filterable: true,
-    filterType: 'dateRange'
+    filterType: 'dateRange',
+    render: (value) => value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : ''
   }
 ];
 

@@ -35,80 +35,15 @@ import {
   Warning
 } from '@mui/icons-material';
 import { DataTable, DataItem, ColumnConfig, FilterCondition } from '../components/DataTable';
+import { userApi } from '../api/services';
+import moment from 'moment';
 
-// 模拟用户数据
-const mockUsers: DataItem[] = [
-  {
-    id: 1,
-    username: 'admin',
-    email: 'admin@example.com',
-    role: 'admin',
-    status: true,
-    avatar: 'A',
-    phone: '13800138000',
-    department: '技术部',
-    createdAt: '2024-01-01',
-    lastLogin: '2024-01-15',
-    loginCount: 156
-  },
-  {
-    id: 2,
-    username: 'user1',
-    email: 'user1@example.com',
-    role: 'user',
-    status: true,
-    avatar: 'U',
-    phone: '13800138001',
-    department: '销售部',
-    createdAt: '2024-01-02',
-    lastLogin: '2024-01-14',
-    loginCount: 89
-  },
-  {
-    id: 3,
-    username: 'user2',
-    email: 'user2@example.com',
-    role: 'user',
-    status: false,
-    avatar: 'U',
-    phone: '13800138002',
-    department: '市场部',
-    createdAt: '2024-01-03',
-    lastLogin: '2024-01-10',
-    loginCount: 45
-  },
-  {
-    id: 4,
-    username: 'manager',
-    email: 'manager@example.com',
-    role: 'manager',
-    status: true,
-    avatar: 'M',
-    phone: '13800138003',
-    department: '管理部',
-    createdAt: '2024-01-04',
-    lastLogin: '2024-01-13',
-    loginCount: 234
-  }
-];
 
 // 列配置
 const columns: ColumnConfig[] = [
+
   {
-    field: 'avatar',
-    label: '头像',
-    width: 80,
-    type: 'custom',
-    editable: false,
-    filterable: false,
-    render: (value, row) => (
-      <Avatar sx={{ bgcolor: row.status ? 'primary.main' : 'grey.500' }}>
-        {value}
-      </Avatar>
-    )
-  },
-  {
-    field: 'username',
+    field: 'name',
     label: '用户名',
     required: true,
     filterable: true,
@@ -189,6 +124,15 @@ const columns: ColumnConfig[] = [
     ]
   },
   {
+    field: 'birthday',
+    label: '生日',
+    type: 'date',
+    editable: true,
+    filterable: true,
+    filterType: 'dateRange',
+    render: (value) => value ? moment(value).format('YYYY-MM-DD') : ''
+  },
+  {
     field: 'status',
     label: '状态',
     type: 'switch',
@@ -204,46 +148,29 @@ const columns: ColumnConfig[] = [
       />
     )
   },
+
   {
-    field: 'loginCount',
-    label: '登录次数',
-    type: 'number',
-    editable: false,
-    filterable: true,
-    filterType: 'numberRange',
-    render: (value) => (
-      <Chip
-        label={value}
-        size="small"
-        variant="outlined"
-        color="primary"
-      />
-    )
-  },
-  {
-    field: 'createdAt',
+    field: 'created_at',
     label: '创建时间',
     editable: false,
     filterable: true,
-    filterType: 'dateRange'
-  },
-  {
-    field: 'lastLogin',
-    label: '最后登录',
-    editable: false,
-    filterable: true,
-    filterType: 'dateRange'
+    filterType: 'dateRange',
+    render: (value) => value ? moment(value).format('YYYY-MM-DD HH:mm:ss') : ''
   }
 ];
 
 export const UserManagement: React.FC = () => {
-  const [data, setData] = useState<DataItem[]>(mockUsers);
-  const [filteredData, setFilteredData] = useState<DataItem[]>(mockUsers);
+  const [data, setData] = useState<DataItem[]>([]);
+  const [filteredData, setFilteredData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error'>('success');
   const [selectedUsers, setSelectedUsers] = useState<(string | number)[]>([]);
   const [bulkActionDialog, setBulkActionDialog] = useState(false);
+
+    // 分页处理
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
   // 处理筛选
   const handleFilter = (filters: FilterCondition[]) => {
@@ -289,11 +216,20 @@ export const UserManagement: React.FC = () => {
   };
 
   // 模拟API调用
-  const simulateApiCall = async (action: string, delay: number = 1000) => {
+  const simulateApiCall = async (action: string = '', delay: number = 1000) => {
     setLoading(true);
-    await new Promise(resolve => setTimeout(resolve, delay));
+    const {data} = await userApi.getUsers({
+      page:page,
+      posts_per_page:pageSize
+    })
+    setData(data.rows)
+    setFilteredData(data.rows)
     setLoading(false);
   };
+
+  useEffect(()=>{
+    simulateApiCall()
+  },[])
 
   // 添加用户
   const handleAdd = async (userData: Partial<DataItem>) => {
@@ -301,13 +237,8 @@ export const UserManagement: React.FC = () => {
       await simulateApiCall('添加用户');
       const newUser = {
         ...userData,
-        id: Date.now(),
-        avatar: userData.username?.charAt(0).toUpperCase() || 'U',
-        createdAt: new Date().toISOString().split('T')[0],
-        lastLogin: '-',
-        loginCount: 0
       };
-      setData(prev => [...prev, newUser]);
+      
       setMessage('用户添加成功');
       setMessageType('success');
     } catch (error) {
@@ -375,9 +306,7 @@ export const UserManagement: React.FC = () => {
     }
   };
 
-  // 分页处理
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
+
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);

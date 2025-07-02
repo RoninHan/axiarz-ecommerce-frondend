@@ -58,6 +58,9 @@ import {
   Tune,
   DateRange
 } from '@mui/icons-material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import moment from 'moment';
 
 // 通用数据类型
 export interface DataItem {
@@ -458,6 +461,23 @@ export const DataTable: React.FC<DataTableProps> = ({
     const error = formErrors[column.field];
 
     switch (column.type) {
+      case 'date':
+        return (
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <DatePicker
+              label={column.label}
+              value={value ? moment(value) : null}
+              onChange={(date) => setFormData(prev => ({ ...prev, [column.field]: date ? date.format('YYYY-MM-DD') : '' }))}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  error: !!error,
+                  helperText: error,
+                }
+              }}
+            />
+          </LocalizationProvider>
+        );
       case 'select':
         return (
           <FormControl fullWidth error={!!error}>

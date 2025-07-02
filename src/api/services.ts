@@ -12,7 +12,7 @@ export const userApi = {
   changePassword: (data: any) => axios.post('/user/change-password', data),
   
   // 获取用户列表
-  getUsers: (params?: any) => axios.get('/users', { params }),
+  getUsers: (params?: any) => axios.get('/api/user', { params }),
   
   // 创建用户
   createUser: (data: any) => axios.post('/users', data),

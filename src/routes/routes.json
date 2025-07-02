@@ -2,26 +2,45 @@
   {
     "path": "/",
     "element": "Dashboard",
-    "auth": true
+    "auth": true,
+    "menu": true,
+    "title": "仪表盘",
+    "icon": "Dashboard"
   },
   {
     "path": "/dashboard",
     "element": "Dashboard",
-    "auth": true
+    "auth": true,
+    "menu": false
   },
   {
     "path": "/users",
     "element": "UserManagement",
-    "auth": true
+    "auth": true,
+    "menu": true,
+    "title": "用户管理",
+    "icon": "People"
   },
   {
     "path": "/products",
     "element": "ProductManagement",
-    "auth": true
+    "auth": true,
+    "menu": true,
+    "title": "商品管理",
+    "icon": "Inventory"
+  },
+  {
+    "path": "/product-crud",
+    "element": "ProductCRUD",
+    "auth": true,
+    "menu": true,
+    "title": "产品增删改查",
+    "icon": "Category"
   },
   {
     "path": "/login",
     "element": "Login",
-    "auth": false
+    "auth": false,
+    "menu": false
   }
 ] 

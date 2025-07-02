@@ -28,6 +28,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { useUserStore } from '../stores/StoreProvider';
 import { userApi } from '../api/services';
+import { useNavigate } from 'react-router-dom';
 
 // 图形验证码组件
 interface CaptchaProps {
@@ -222,6 +223,7 @@ export const Login: React.FC = observer(() => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
+  const navigate = useNavigate();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -251,7 +253,7 @@ export const Login: React.FC = observer(() => {
       }
 
       // 模拟登录请求
-     const data = await userApi.login(formData);
+     const {data} = await userApi.login(formData);
      console.log(data)
      alert(1)
 
@@ -265,7 +267,7 @@ export const Login: React.FC = observer(() => {
       // 模拟
 
       // 登录成功
-      // userStore.login(mockUser, mockToken);
+      userStore.login(data.user, data.token);
 
       // 如果记住我，保存用户名
       if (formData.rememberMe) {
@@ -275,7 +277,7 @@ export const Login: React.FC = observer(() => {
       }
 
       // 跳转到仪表盘
-      window.location.href = '/dashboard';
+      navigate('/dashboard', { replace: true });
 
     } catch (err) {
       setError('登录失败，请检查用户名和密码');
