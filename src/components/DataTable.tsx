@@ -81,7 +81,7 @@ export interface ColumnConfig {
   field: string;
   label: string;
   width?: number | string;
-  type?: 'text' | 'number' | 'date' | 'select' | 'switch' | 'chip' | 'custom' | 'boolean';
+  type?: 'text' | 'number' | 'date' | 'select' | 'switch' | 'chip' | 'custom' | 'boolean' | 'upload';
   options?: { value: any; label: string }[];
   render?: (value: any, row: DataItem) => React.ReactNode;
   formRender?: (value: any, onChange: (v: any) => void) => React.ReactNode;
@@ -92,7 +92,9 @@ export interface ColumnConfig {
   filterType?: 'text' | 'select' | 'date' | 'dateRange' | 'number' | 'numberRange' | 'boolean' | 'multiSelect';
   filterOptions?: { value: any; label: string }[]; // 筛选选项
   filterPlaceholder?: string; // 筛选占位符
+  uploadHandler?: (file: File) => Promise<string>; // 可选，上传逻辑，返回文件url
 }
+
 
 // 组件属性类型
 export interface DataTableProps {
@@ -180,10 +182,15 @@ export const DataTable: React.FC<DataTableProps> = ({
     const errors: Record<string, string> = {};
     
     columns.forEach(column => {
-      if (column.required && !formData[column.field]) {
+      const value = formData[column.field];
+      // upload类型特殊处理：空字符串、null、undefined都算未上传
+      if (column.required && (
+        value === undefined || value === null || value === '' ||
+        (column.type === 'upload' && (!value || (typeof value === 'object' && !value.name && !value.url)))
+      )) {
         errors[column.field] = `${column.label}是必填项`;
       } else if (column.validation) {
-        const error = column.validation(formData[column.field]);
+        const error = column.validation(value);
         if (error) {
           errors[column.field] = error;
         }
@@ -200,10 +207,26 @@ export const DataTable: React.FC<DataTableProps> = ({
 
     setSubmitting(true);
     try {
+      // 检查是否有upload字段
+      const hasUpload = columns.some(col => col.type === 'upload');
+      let submitData: any = formData;
+      if (hasUpload) {
+        const fd = new FormData();
+        columns.forEach(col => {
+          const val = formData[col.field];
+          if (col.type === 'upload' && val) {
+            // File对象或字符串（如url）都append
+            fd.append(col.field, val);
+          } else if (val !== undefined && val !== null) {
+            fd.append(col.field, val);
+          }
+        });
+        submitData = fd;
+      }
       if (editingItem) {
-        await onEdit?.(editingItem.id, formData);
+        await onEdit?.(editingItem.id, submitData);
       } else {
-        await onAdd?.(formData);
+        await onAdd?.(submitData);
       }
       handleCloseForm();
     } catch (error) {
@@ -500,7 +523,6 @@ export const DataTable: React.FC<DataTableProps> = ({
             </Select>
           </FormControl>
         );
-
       case 'switch':
         return (
           <FormControlLabel
@@ -513,7 +535,69 @@ export const DataTable: React.FC<DataTableProps> = ({
             label={column.label}
           />
         );
-
+      case 'upload':
+        // 仅允许图片类型
+         const api = import.meta.env.VITE_API_BASE_URL;
+        const isImage = (fileOrUrl: any) => {
+         
+          if (!fileOrUrl) return false;
+          if (typeof fileOrUrl === 'string') {
+            return /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(fileOrUrl);
+          }
+          if (fileOrUrl.type) {
+            return fileOrUrl.type.startsWith('image/');
+          }
+          return false;
+        };
+        let previewUrl = '';
+        if (typeof value === 'string' && isImage(value)) {
+          previewUrl = value;
+        } else if (value && value instanceof File && isImage(value)) {
+          previewUrl = URL.createObjectURL(value);
+        }
+        return (
+          <Box>
+            <Button
+              variant="outlined"
+              component="label"
+              size="small"
+              sx={{ mr: 2 }}
+            >
+              上传图片
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  if (!file.type.startsWith('image/')) {
+                    setFormErrors(prev => ({ ...prev, [column.field]: '仅支持图片文件' }));
+                    return;
+                  }
+                  setFormErrors(prev => ({ ...prev, [column.field]: '' }));
+                  if (column.uploadHandler) {
+                    const url = await column.uploadHandler(file);
+                    setFormData(prev => ({ ...prev, [column.field]: url }));
+                  } else {
+                    setFormData(prev => ({ ...prev, [column.field]: file }));
+                  }
+                }}
+              />
+            </Button>
+            {previewUrl && (
+              <Box sx={{ display: 'inline-block', verticalAlign: 'middle', mr: 2 }}>
+                <img src={api + previewUrl} alt="预览" style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 4, border: '1px solid #eee' }} />
+              </Box>
+            )}
+            {value && !previewUrl && (
+              <Typography variant="body2" component="span">{typeof value === 'string' ? value : (value.name || '')}</Typography>
+            )}
+            {error && (
+              <Typography color="error" variant="caption" display="block">{error}</Typography>
+            )}
+          </Box>
+        );
       default:
         return (
           <TextField
@@ -545,6 +629,13 @@ export const DataTable: React.FC<DataTableProps> = ({
       case 'select':
         const option = column.options?.find(opt => opt.value === value);
         return option?.label || value;
+      case 'upload':
+        if (!value) return '';
+        // 如果是url则显示下载链接，否则显示文件名
+        if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
+          return <a href={value} target="_blank" rel="noopener noreferrer">下载</a>;
+        }
+        return value.name || value;
       default:
         return value;
     }

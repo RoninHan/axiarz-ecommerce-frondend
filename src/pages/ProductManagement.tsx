@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, Avatar, TextField, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { DataTable, ColumnConfig, DataItem } from '../components/DataTable';
 import { productApi } from '../api/services';
 
@@ -9,12 +9,20 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'category_id', label: '分类ID', type: 'number', required: true, filterable: true,
-    filterType: 'text',
+    field: 'category_id', label: '分类ID', type: 'select', required: true, filterable: true,
+    options: [],
+    filterType: 'select',
   },
   {
-    field: 'status', label: '状态', type: 'boolean', required: true, filterable: true,
-    filterType: 'boolean',
+    field: 'status', label: '状态', type: 'select', required: true, filterable: true,
+    options: [
+      
+      { label: '上架', value: 1 },
+      { label: '審核中', value: 2 },
+      { label: '删除', value: 3 },
+      { label: '下架', value: 4 },
+    ],
+    filterType: 'select',
   },
   {
     field: 'description', label: '描述', type: 'text', required: true, filterable: true,
@@ -28,17 +36,7 @@ const columns: ColumnConfig[] = [
     field: 'price', label: '价格', type: 'number', required: true, filterable: true,
     filterType: 'text',
   },
-  {
-    field: 'image',
-    label: '图片',
-    type: 'custom',
-    required: false,
-    filterable: true,
-    filterType: 'text',
-    render: (value) => value ? (
-      <Avatar src={typeof value === 'string' ? value : URL.createObjectURL(value)} variant="rounded" sx={{ width: 56, height: 56 }} />
-    ) : null
-  },
+  
   {
     field: 'sku', label: 'SKU', required: true, filterable: true,
     filterType: 'text',
@@ -68,8 +66,31 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'is_new', label: '是否新品', type: 'boolean', required: false, filterable: true,
-    filterType: 'boolean',
+    field: 'is_new', label: '是否新品', type: 'select', required: false, filterable: true,
+    filterType: 'select',
+    options: [
+      { label: '是', value: 1 },
+      { label: '否', value: 2 },
+    ],
+  },
+  {
+    field: 'image_url',
+    label: '图片',
+    type: 'upload',
+    required: false,
+    filterable: true,
+    filterType: 'text',
+    render: (value: any, row: DataItem) => {
+      const api = import.meta.env.VITE_API_BASE_URL;
+      console.log(value);
+      return (
+        <div className='w-20'>
+          {value ? (
+            <img src={typeof value === 'string' ? api + value : api + URL.createObjectURL(value)} alt="商品图片" style={{ width: 120, objectFit: 'cover', borderRadius: 4 }} />
+          ) : null}
+        </div>
+      );
+    }
   },
 ];
 
@@ -81,7 +102,15 @@ export const ProductManagement = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  const fetchCategories = async () => {
+    const { data: categories } = await productApi.getCategories();
+    return categories.rows.map((cat: any) => ({ label: cat.name, value: cat.id }));
+  };
+
   useEffect(() => {
+    fetchCategories().then(options => {
+      columns.find(col => col.field === 'category_id')!.options = options;
+    });
     // 初始化数据
     fetchData();
   }, []);
@@ -108,6 +137,7 @@ export const ProductManagement = () => {
   };
 
   const handleAdd = async (item: Partial<DataItem>) => {
+    console.log('添加商品:', item);
     setLoading(true);
     await productApi.createProduct(item);
     setLoading(false);

@@ -36,10 +36,22 @@ export const productApi = {
   getProduct: (id: string) => axios.get(`/api/product/get/${id}`),
   
   // 创建商品
-  createProduct: (data: any) => axios.post('/api/product/create', data),
+  createProduct: (data: any) => {
+    // 如果是FormData则不设置Content-Type（让axios自动处理multipart边界），否则用json
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return axios.post('/api/product/create', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : { headers: { 'Content-Type': 'application/json' } });
+  },
   
   // 更新商品
-  updateProduct: (id: string, data: any) => axios.post(`/api/product/update/${id}`, data),
+  updateProduct: (id: string, data: any) => {
+    // 如果是FormData则不设置Content-Type（让axios自动处理multipart边界），否则用json
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return axios.post(`/api/product/update/${id}`, data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : { headers: { 'Content-Type': 'application/json' } });
+  },
   
   // 删除商品
   deleteProduct: (id: string) => axios.delete(`/api/product/delete/${id}`),
@@ -49,6 +61,12 @@ export const productApi = {
   
   // 创建商品分类
   createCategory: (data: any) => axios.post('/api/category/create', data),
+  
+  // 更新商品分类
+  updateCategory: (id: string, data: any) => axios.post(`/api/category/update/${id}`, data),
+  
+  // 删除商品分类
+  deleteCategory: (id: string) => axios.delete(`/api/category/delete/${id}`),
 };
 
 // 订单相关 API

@@ -8,7 +8,7 @@ const columns: ColumnConfig[] = [
         filterType: 'text',
       },
       {
-        field: 'name', label: '详细', required: true, filterable: true,
+        field: 'description', label: '详细', required: true, filterable: true,
         filterType: 'text',
       }
 ]
@@ -39,7 +39,17 @@ export const CategoryManagement = () =>{
         fetchData();
     }
 
+    const handleDelete = async (id: string | number): Promise<void> => {
+        await productApi.deleteCategory(id.toString());
+        fetchData();
+    }
+
+    const handleEdit = async (id: string | number, data: Partial<any>): Promise<void> => {
+        await productApi.updateCategory(id.toString(), data);
+        fetchData();
+    }
+
     return (
-        <DataTable columns={columns} data={data} loading={loading} onAdd={handleAdd} />
+        <DataTable columns={columns} data={data} loading={loading} onAdd={handleAdd} onDelete={handleDelete} onEdit={handleEdit} />
     )
 }

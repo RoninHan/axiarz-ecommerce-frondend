@@ -36,9 +36,10 @@ interface CaptchaProps {
   onChange: (value: string) => void;
   onRefresh: () => void;
   error?: boolean;
+  onCaptchaChange?: (captcha: string) => void; // 新增: 通知父组件当前验证码
 }
 
-const Captcha: React.FC<CaptchaProps> = ({ value, onChange, onRefresh, error }) => {
+const Captcha: React.FC<CaptchaProps> = ({ value, onChange, onRefresh, error, onCaptchaChange }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [captchaText, setCaptchaText] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -63,6 +64,9 @@ const Captcha: React.FC<CaptchaProps> = ({ value, onChange, onRefresh, error }) 
       text += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     setCaptchaText(text);
+    if (onCaptchaChange) {
+      onCaptchaChange(text);
+    }
 
     // 创建渐变背景
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -136,6 +140,7 @@ const Captcha: React.FC<CaptchaProps> = ({ value, onChange, onRefresh, error }) 
   // 初始化验证码
   useEffect(() => {
     generateCaptcha();
+    // eslint-disable-next-line
   }, []);
 
   // 刷新验证码
@@ -223,6 +228,7 @@ export const Login: React.FC = observer(() => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [captchaError, setCaptchaError] = useState(false);
+  const [currentCaptcha, setCurrentCaptcha] = useState(''); // 新增: 当前验证码
   const navigate = useNavigate();
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -239,6 +245,10 @@ export const Login: React.FC = observer(() => {
     }
   };
 
+  const handleCaptchaChange = (captcha: string) => {
+    setCurrentCaptcha(captcha);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -249,22 +259,19 @@ export const Login: React.FC = observer(() => {
       // 验证表单
       if (!formData.email || !formData.password || !formData.captcha) {
         setError('请填写所有必填字段');
+        setLoading(false);
         return;
       }
 
       // 模拟登录请求
-     const {data} = await userApi.login(formData);
-     console.log(data)
-     alert(1)
-
-      // 模拟验证码验证
-      if (formData.captcha.toUpperCase() !== 'ABCD') {
+      const { data } = await userApi.login(formData);
+      // 验证码校验
+      if (formData.captcha.toUpperCase() !== currentCaptcha.toUpperCase()) {
         setCaptchaError(true);
         setError('验证码错误，请重新输入');
+        setLoading(false);
         return;
       }
-
-      // 模拟
 
       // 登录成功
       userStore.login(data.user, data.token);
@@ -385,6 +392,7 @@ export const Login: React.FC = observer(() => {
                   onChange={(value) => handleInputChange('captcha', value)}
                   onRefresh={() => handleInputChange('captcha', '')}
                   error={captchaError}
+                  onCaptchaChange={handleCaptchaChange}
                 />
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
