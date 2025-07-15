@@ -84,6 +84,7 @@ export interface ColumnConfig {
   type?: 'text' | 'number' | 'date' | 'select' | 'switch' | 'chip' | 'custom' | 'boolean';
   options?: { value: any; label: string }[];
   render?: (value: any, row: DataItem) => React.ReactNode;
+  formRender?: (value: any, onChange: (v: any) => void) => React.ReactNode;
   editable?: boolean;
   required?: boolean;
   validation?: (value: any) => string | null;
@@ -459,6 +460,10 @@ export const DataTable: React.FC<DataTableProps> = ({
   const renderFormField = (column: ColumnConfig) => {
     const value = formData[column.field] || '';
     const error = formErrors[column.field];
+
+    if (column.formRender) {
+      return column.formRender(value, (v) => setFormData(prev => ({ ...prev, [column.field]: v })));
+    }
 
     switch (column.type) {
       case 'date':

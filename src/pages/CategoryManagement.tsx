@@ -2,7 +2,16 @@ import { useEffect, useState } from "react";
 import { ColumnConfig, DataTable } from "../components/DataTable";
 import { productApi } from "../api/services";
 
-const columns: ColumnConfig[] = []
+const columns: ColumnConfig[] = [
+    {
+        field: 'name', label: '类型名称', required: true, filterable: true,
+        filterType: 'text',
+      },
+      {
+        field: 'name', label: '详细', required: true, filterable: true,
+        filterType: 'text',
+      }
+]
 
 export const CategoryManagement = () =>{
 
