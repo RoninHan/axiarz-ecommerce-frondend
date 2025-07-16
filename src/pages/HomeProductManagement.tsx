@@ -18,9 +18,10 @@ const columns: ColumnConfig[] = [
     required: false,
     filterable: true,
     filterType: 'text',
+    hidden: true, // 新增 hidden 字段，控制是否在表格中显示
     render: (value: any, row: DataItem) => {
       const api = import.meta.env.VITE_API_BASE_URL;
-      console.log(value);
+      // console.log(value);
       return (
         <div className='w-20'>
           {value ? (
@@ -97,7 +98,7 @@ export const HomeProductManagement = () => {
 
   return (
       <DataTable
-        columns={columns}
+        columns={columns.filter(col => !col.hidden)}
         data={data}
         loading={loading}
         page={page}

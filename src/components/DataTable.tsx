@@ -93,6 +93,7 @@ export interface ColumnConfig {
   filterOptions?: { value: any; label: string }[]; // 筛选选项
   filterPlaceholder?: string; // 筛选占位符
   uploadHandler?: (file: File) => Promise<string>; // 可选，上传逻辑，返回文件url
+  hidden?: boolean; // 新增 hidden 字段，控制是否在表格中显示
 }
 
 
