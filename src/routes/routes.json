@@ -30,6 +30,14 @@
     "icon": "Category"
   },
   {
+    "path": "/homeProducts",
+    "element": "HomeProductManagement",
+    "auth": true,
+    "menu": true,
+    "title": "首頁產品管理",
+    "icon": "Category"
+  },
+  {
     "path": "/categories",
     "element": "CategoryManagement",
     "auth": true,

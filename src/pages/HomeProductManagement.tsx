@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { DataTable, ColumnConfig, DataItem } from '../components/DataTable';
 import { productApi } from '../api/services';
 
@@ -9,69 +8,8 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'category_id', label: '分类ID', type: 'select', required: true, filterable: true,
-    options: [],
-    filterType: 'select',
-  },
-  {
-    field: 'status', label: '状态', type: 'select', required: true, filterable: true,
-    options: [
-      
-      { label: '上架', value: 1 },
-      { label: '審核中', value: 2 },
-      { label: '删除', value: 3 },
-      { label: '下架', value: 4 },
-    ],
-    filterType: 'select',
-  },
-  {
-    field: 'description', label: '描述', type: 'text', required: true, filterable: true,
+    field: 'description', label: '描述', required: true, filterable: true,
     filterType: 'text',
-  },
-  {
-    field: 'stock_quantity', label: '库存', type: 'number', required: true, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'price', label: '价格', type: 'number', required: true, filterable: true,
-    filterType: 'text',
-  },
-  
-  {
-    field: 'sku', label: 'SKU', required: true, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'type_name', label: '型号', required: true, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'brand', label: '品牌', required: true, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'product_details', label: '详情', type: 'text', required: false, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'product_information', label: '信息', type: 'text', required: false, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'configuration_list', label: '配置', type: 'text', required: false, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'wass', label: '备注', type: 'text', required: false, filterable: true,
-    filterType: 'text',
-  },
-  {
-    field: 'is_new', label: '是否新品', type: 'select', required: false, filterable: true,
-    filterType: 'select',
-    options: [
-      { label: '是', value: 1 },
-      { label: '否', value: 2 },
-    ],
   },
   {
     field: 'image_url',
@@ -94,7 +32,7 @@ const columns: ColumnConfig[] = [
   },
 ];
 
-export const ProductManagement = () => {
+export const HomeProductManagement = () => {
   const [data, setData] = useState<DataItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -102,15 +40,9 @@ export const ProductManagement = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const fetchCategories = async () => {
-    const { data: categories } = await productApi.getCategories();
-    return categories.rows.map((cat: any) => ({ label: cat.name, value: cat.id }));
-  };
 
   useEffect(() => {
-    fetchCategories().then(options => {
-      columns.find(col => col.field === 'category_id')!.options = options;
-    });
+
     // 初始化数据
     fetchData();
   }, []);
@@ -127,12 +59,9 @@ export const ProductManagement = () => {
   // 示例：可用productApi.getProducts等真实接口
   const fetchData = async () => {
     setLoading(true);
-    const { data } = await productApi.getProducts({
-      page: page,
-      posts_per_page: pageSize,
-    });
-
-    setData(data.rows);
+    const { data } = await productApi.getHomeProducts();
+    console.log(data);
+    setData(data);
     setLoading(false);
   };
 

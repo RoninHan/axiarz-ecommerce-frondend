@@ -759,8 +759,8 @@ export const DataTable: React.FC<DataTableProps> = ({
                 </TableCell>
               </TableRow>
             ) : (
-              data.map(row => (
-                <TableRow key={row.id} hover>
+              data.map((row, rowIdx) => (
+                <TableRow key={String(row.id) + '_' + rowIdx} hover>
                   {selectable && (
                     <TableCell padding="checkbox">
                       <input
@@ -770,8 +770,8 @@ export const DataTable: React.FC<DataTableProps> = ({
                       />
                     </TableCell>
                   )}
-                  {columns.map(column => (
-                    <TableCell key={column.field}>
+                  {columns.map((column, colIdx) => (
+                    <TableCell key={String(column.field) + '_' + row.id}>
                       {renderCell(column, row)}
                     </TableCell>
                   ))}
@@ -869,8 +869,8 @@ export const DataTable: React.FC<DataTableProps> = ({
               </IconButton>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {columns.filter(col => col.editable !== false).map(column => (
-                <Box key={column.field}>
+              {columns.filter(col => col.editable !== false).map((column, idx) => (
+                <Box key={column.field || idx}>
                   {renderFormField(column)}
                 </Box>
               ))}
@@ -897,8 +897,8 @@ export const DataTable: React.FC<DataTableProps> = ({
           </DialogTitle>
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-              {columns.filter(col => col.editable !== false).map(column => (
-                <Box key={column.field}>
+              {columns.filter(col => col.editable !== false).map((column, idx) => (
+                <Box key={column.field || idx}>
                   {renderFormField(column)}
                 </Box>
               ))}

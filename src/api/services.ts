@@ -1,3 +1,4 @@
+import { add } from 'date-fns';
 import axios from './instance';
 
 // 用户相关 API
@@ -67,6 +68,17 @@ export const productApi = {
   
   // 删除商品分类
   deleteCategory: (id: string) => axios.delete(`/api/category/delete/${id}`),
+
+  getHomeProducts: () => axios.get('/api/product/home'),
+
+  addHomeProduct: (data: any) => {
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return axios.post('/api/product/home/add', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : { headers: { 'Content-Type': 'application/json' } });
+  },
+
+  deleteHomeProduct: (id: string) => axios.delete(`/api/product/delete_home_product/${id}`),
 };
 
 // 订单相关 API

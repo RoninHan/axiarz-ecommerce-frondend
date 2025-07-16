@@ -8,6 +8,7 @@ import { Login } from '../pages/Login';
 import { MainLayout } from '../layouts/MainLayout';
 import { useUserStore } from '../stores/StoreProvider';
 import { CategoryManagement } from '../pages/CategoryManagement';
+import { HomeProductManagement } from '../pages/HomeProductManagement';
 
 const elementMap: Record<string, React.ReactNode> = {
   Dashboard: <Dashboard />,
@@ -15,6 +16,7 @@ const elementMap: Record<string, React.ReactNode> = {
   ProductManagement: <ProductManagement />,
   Login: <Login />,
   CategoryManagement: <CategoryManagement />,
+  HomeProductManagement: <HomeProductManagement />, 
 };
 
 /**
