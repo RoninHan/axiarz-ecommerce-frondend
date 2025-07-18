@@ -20,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import { observer } from 'mobx-react-lite';
 import { useUserStore, useAppStore } from '../stores/StoreProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -28,6 +29,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = observer(({ onMenuClick }) => {
   const userStore = useUserStore();
   const appStore = useAppStore();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -41,6 +43,7 @@ export const Header: React.FC<HeaderProps> = observer(({ onMenuClick }) => {
   const handleLogout = () => {
     userStore.logout();
     handleMenuClose();
+    navigate('/login');
   };
 
   const handleThemeToggle = () => {
