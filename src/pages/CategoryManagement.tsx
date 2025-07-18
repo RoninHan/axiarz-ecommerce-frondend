@@ -17,11 +17,16 @@ export const CategoryManagement = () =>{
 
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
 
     const fetchData  = async () =>{
         setLoading(true);
-        const {data} = await productApi.getCategories()
+        const {data} = await productApi.getCategories({
+            page: page,
+            posts_per_page: pageSize,
+        })
         setData(data.rows);
         setLoading(false);
     }
@@ -50,6 +55,6 @@ export const CategoryManagement = () =>{
     }
 
     return (
-        <DataTable columns={columns} data={data} loading={loading} onAdd={handleAdd} onDelete={handleDelete} onEdit={handleEdit} />
+        <DataTable columns={columns} data={data} loading={loading} onAdd={handleAdd} onDelete={handleDelete} onEdit={handleEdit} onPageChange={setPage} onPageSizeChange={setPageSize} page={page} pageSize={pageSize} />
     )
 }

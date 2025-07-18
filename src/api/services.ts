@@ -58,7 +58,7 @@ export const productApi = {
   deleteProduct: (id: string) => axios.delete(`/api/product/delete/${id}`),
   
   // 获取商品分类
-  getCategories: () => axios.get('/api/category/get'),
+  getCategories: (params?: any) => axios.get('/api/category/get', { params }),
   
   // 创建商品分类
   createCategory: (data: any) => axios.post('/api/category/create', data),

@@ -30,11 +30,16 @@ const columns: ColumnConfig[] = [
 export const BannerManagement = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // 示例：可对接真实API
   const fetchData = async () => {
     setLoading(true);
-    const res = await bannerApi.getBanners();
+    const res = await bannerApi.getBanners({
+      page,
+      posts_per_page: pageSize
+    });
     setData(res.data);
     setLoading(false);
   };
@@ -73,6 +78,10 @@ export const BannerManagement = () => {
       onAdd={handleAdd}
       onEdit={handleEdit}
       onDelete={handleDelete}
+      onPageChange={setPage}
+      onPageSizeChange={setPageSize}
+      page={page}
+      pageSize={pageSize}
     />
   );
 };
