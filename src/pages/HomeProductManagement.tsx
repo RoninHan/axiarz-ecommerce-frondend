@@ -8,15 +8,20 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'description', label: '描述', required: true, filterable: true,
+    field: 'description', label: '描述', required: true, filterable: false,
     filterType: 'text',
+  },
+  {
+    field: 'product_type_id', label: '顯示在首頁的產品類型', required: true, filterable: true,type: 'select',
+    options: [],
+    filterType: 'select',hidden: true, 
   },
   {
     field: 'image_url',
     label: '图片',
     type: 'upload',
     required: false,
-    filterable: true,
+    filterable: false,
     filterType: 'text',
     hidden: true, // 新增 hidden 字段，控制是否在表格中显示
     render: (value: any, row: DataItem) => {
@@ -43,7 +48,7 @@ export const HomeProductManagement = () => {
 
 
   useEffect(() => {
-
+    getCategories();
     // 初始化数据
     fetchData();
   }, []);
@@ -60,8 +65,7 @@ export const HomeProductManagement = () => {
   // 示例：可用productApi.getProducts等真实接口
   const fetchData = async () => {
     setLoading(true);
-    const { data } = await productApi.getHomeProducts();
-    console.log(data);
+    const { data } = await productApi.getHomeProducts()
     setData(data);
     setLoading(false);
   };
@@ -96,9 +100,21 @@ export const HomeProductManagement = () => {
     console.log(filter);
   };
 
+  const getCategories = async () => {
+    const { data } = await productApi.getCategories();
+    columns.forEach(col => {
+      if (col.field === 'product_type_id') {
+        col.options = data.rows.map((item: any) => ({
+          label: item.name,
+          value: item.id,
+        }));
+      }
+    });
+  };
+
   return (
       <DataTable
-        columns={columns.filter(col => !col.hidden)}
+        columns={columns}
         data={data}
         loading={loading}
         page={page}

@@ -84,17 +84,17 @@ export const productApi = {
 // 订单相关 API
 export const orderApi = {
   // 获取订单列表
-  getOrders: (params?: any) => axios.get('/orders', { params }),
+  getOrders: (params?: any) => axios.get('/api/order/list', { params }),
   
-  // 获取订单详情
-  getOrder: (id: string) => axios.get(`/orders/${id}`),
+  // // 获取订单详情
+  // getOrder: (id: string) => axios.get(`/orders/${id}`),
   
-  // 更新订单状态
-  updateOrderStatus: (id: string, status: string) => 
-    axios.patch(`/orders/${id}/status`, { status }),
+  // // 更新订单状态
+  // updateOrderStatus: (id: string, status: string) => 
+  //   axios.patch(`/orders/${id}/status`, { status }),
   
-  // 获取订单统计
-  getOrderStats: () => axios.get('/orders/stats'),
+  // // 获取订单统计
+  // getOrderStats: () => axios.get('/orders/stats'),
 };
 
 // 客户相关 API
@@ -153,13 +153,25 @@ export const settingsApi = {
 
 export const bannerApi = {
   // 获取横幅列表
-  getBanners: (params?: any) => axios.get('/banners', { params }),
+  getBanners: (params?: any) => axios.get('/api/banner/all', { params }),
   // 創建横幅
-  createBanner: (data: any) => axios.post('/banners', data),
+  createBanner: (data: any) => {
+    // 如果是FormData则不设置Content-Type（让axios自动处理multipart边界），否则用json
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return axios.post('/api/banner/create', data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : { headers: { 'Content-Type': 'application/json' } });
+  },
   // 更新横幅
-  updateBanner: (id: string, data: any) => axios.put(`/banners/${id}`, data),
+  updateBanner: (id: string, data: any) => {
+    // 如果是FormData则不设置Content-Type（让axios自动处理multipart边界），否则用json
+    const isFormData = typeof FormData !== 'undefined' && data instanceof FormData;
+    return axios.post(`/api/banner/update/${id}`, data, isFormData ? {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    } : { headers: { 'Content-Type': 'application/json' } });
+  },
   // 删除横幅
-  deleteBanner: (id: string) => axios.delete(`/banners/${id}`),
+  deleteBanner: (id: string) => axios.delete(`/api/banner/delete/${id}`),
   // 获取横幅详情
-  getBanner: (id: string) => axios.get(`/banners/${id}`),
+  // getBanner: (id: string) => axios.get(`/api/banner/${id}`),
 }

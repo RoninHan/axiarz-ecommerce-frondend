@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography } from '@mui/material';
 import { DataTable, ColumnConfig, DataItem } from '../components/DataTable';
 import { productApi } from '../api/services';
 
@@ -11,6 +10,7 @@ const columns: ColumnConfig[] = [
   {
     field: 'category_id', label: '分类ID', type: 'select', required: true, filterable: true,
     options: [],
+    filterOptions: [],
     filterType: 'select',
   },
   {
@@ -22,18 +22,24 @@ const columns: ColumnConfig[] = [
       { label: '删除', value: 3 },
       { label: '下架', value: 4 },
     ],
+    filterOptions: [
+      { label: '上架', value: 1 },
+      { label: '審核中', value: 2 },
+      { label: '删除', value: 3 },
+      { label: '下架', value: 4 },
+    ],
     filterType: 'select',
   },
   {
-    field: 'description', label: '描述', type: 'text', required: true, filterable: true,
+    field: 'description', label: '描述', type: 'text', required: true, filterable: false,
     filterType: 'text',
   },
   {
-    field: 'stock_quantity', label: '库存', type: 'number', required: true, filterable: true,
+    field: 'stock_quantity', label: '库存', type: 'number', required: true, filterable: false,
     filterType: 'text',
   },
   {
-    field: 'price', label: '价格', type: 'number', required: true, filterable: true,
+    field: 'price', label: '价格', type: 'number', required: true, filterable: false,
     filterType: 'text',
   },
   
@@ -42,7 +48,7 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'type_name', label: '型号', required: true, filterable: true,
+    field: 'type_name', label: '型号', required: true, filterable: false,
     filterType: 'text',
   },
   {
@@ -50,25 +56,29 @@ const columns: ColumnConfig[] = [
     filterType: 'text',
   },
   {
-    field: 'product_details', label: '详情', type: 'text', required: false, filterable: true,
+    field: 'product_details', label: '详情', type: 'text', required: false, filterable: false,
     filterType: 'text',
   },
   {
-    field: 'product_information', label: '信息', type: 'text', required: false, filterable: true,
+    field: 'product_information', label: '信息', type: 'text', required: false, filterable: false,
     filterType: 'text',
   },
   {
-    field: 'configuration_list', label: '配置', type: 'text', required: false, filterable: true,
+    field: 'configuration_list', label: '配置', type: 'text', required: false, filterable: false,
     filterType: 'text',
   },
   {
-    field: 'wass', label: '备注', type: 'text', required: false, filterable: true,
+    field: 'wass', label: '备注', type: 'text', required: false, filterable: false,
     filterType: 'text',
   },
   {
     field: 'is_new', label: '是否新品', type: 'select', required: false, filterable: true,
     filterType: 'select',
     options: [
+      { label: '是', value: 1 },
+      { label: '否', value: 2 },
+    ],
+    filterOptions: [
       { label: '是', value: 1 },
       { label: '否', value: 2 },
     ],
@@ -110,6 +120,7 @@ export const ProductManagement = () => {
   useEffect(() => {
     fetchCategories().then(options => {
       columns.find(col => col.field === 'category_id')!.options = options;
+      columns.find(col => col.field === 'category_id')!.filterOptions = options;
     });
     // 初始化数据
     fetchData();
@@ -137,7 +148,7 @@ export const ProductManagement = () => {
   };
 
   const handleAdd = async (item: Partial<DataItem>) => {
-    console.log('添加商品:', item);
+    
     setLoading(true);
     await productApi.createProduct(item);
     setLoading(false);

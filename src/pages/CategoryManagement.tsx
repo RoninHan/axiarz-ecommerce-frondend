@@ -8,7 +8,7 @@ const columns: ColumnConfig[] = [
         filterType: 'text',
       },
       {
-        field: 'description', label: '详细', required: true, filterable: true,
+        field: 'description', label: '详细', required: true, filterable: false,
         filterType: 'text',
       }
 ]

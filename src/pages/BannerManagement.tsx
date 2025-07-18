@@ -1,35 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { ColumnConfig, DataTable } from "../components/DataTable";
+import { ColumnConfig, DataItem, DataTable } from "../components/DataTable";
+import { bannerApi } from "../api/services";
 
 const columns: ColumnConfig[] = [
+  { field: 'title', label: '标题', required: true,filterable: true, filterType: 'text' },
+  { field: 'link', label: '链接', required: true,filterable: false },
   {
     field: 'image',
     label: '图片',
-    type: 'custom',
-    required: true,
-    render: (value) =>
-      value ? (
-        <img src={typeof value === 'string' ? value : URL.createObjectURL(value)} alt="banner" style={{ width: 80, height: 40, objectFit: 'cover', borderRadius: 4 }} />
-      ) : null,
-    formRender: (value, onChange) => (
-      <div>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={e => {
-            if (e.target.files && e.target.files[0]) {
-              onChange(e.target.files[0]);
-            }
-          }}
-        />
-        {value && (
-          <img src={typeof value === 'string' ? value : URL.createObjectURL(value)} alt="预览" style={{ width: 80, height: 40, marginTop: 8, borderRadius: 4 }} />
-        )}
-      </div>
-    )
+    type: 'upload',
+    required: false,
+    filterType: 'text',
+    render: (value: any, row: DataItem) => {
+      const api = import.meta.env.VITE_API_BASE_URL;
+      console.log(value);
+      return (
+        <div className='w-20'>
+          {value ? (
+            <img src={typeof value === 'string' ? api + value : api + URL.createObjectURL(value)} alt="商品图片" style={{ width: 120, objectFit: 'cover', borderRadius: 4 }} />
+          ) : null}
+        </div>
+      );
+    }
+
   },
-  { field: 'title', label: '标题', required: true },
-  { field: 'link', label: '链接', required: true }
+
 ];
 
 export const BannerManagement = () => {
@@ -39,8 +34,8 @@ export const BannerManagement = () => {
   // 示例：可对接真实API
   const fetchData = async () => {
     setLoading(true);
-    // const res = await bannerApi.getBanners();
-    // setData(res.data);
+    const res = await bannerApi.getBanners();
+    setData(res.data);
     setLoading(false);
   };
 
@@ -50,18 +45,24 @@ export const BannerManagement = () => {
 
   // 新增/编辑时如需form-data，可在此处理
   const handleAdd = async (item: Partial<any>) => {
-    // const formData = new FormData();
-    // Object.entries(item).forEach(([k, v]) => formData.append(k, v));
-    // await bannerApi.createBanner(formData);
-    setData(prev => [...prev, { ...item, id: Date.now() }]);
+    setLoading(true);
+    await bannerApi.createBanner(item);
+    setLoading(false);
+    fetchData();
   };
 
   const handleEdit = async (id: string | number, item: Partial<any>) => {
-    setData(prev => prev.map(row => row.id === id ? { ...row, ...item } : row));
+    setLoading(true);
+    await bannerApi.updateBanner(id.toString(), item);
+    setLoading(false);
+    fetchData();
   };
 
   const handleDelete = async (id: string | number) => {
-    setData(prev => prev.filter(row => row.id !== id));
+    setLoading(true);
+    await bannerApi.deleteBanner(id.toString());
+    setLoading(false);
+    fetchData();
   };
 
   return (

@@ -79,13 +79,6 @@ export const Header: React.FC<HeaderProps> = observer(({ onMenuClick }) => {
             {appStore.theme === 'dark' ? <Brightness7 /> : <Brightness4 />}
           </IconButton>
 
-          {/* 通知 */}
-          <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <Notifications />
-            </Badge>
-          </IconButton>
-
           {/* 用户菜单 */}
           <IconButton
             color="inherit"
@@ -117,11 +110,6 @@ export const Header: React.FC<HeaderProps> = observer(({ onMenuClick }) => {
             horizontal: 'right',
           }}
         >
-          <MenuItem onClick={handleMenuClose}>
-            <Typography variant="body2">
-              {userStore.user?.username || '用户'}
-            </Typography>
-          </MenuItem>
           <MenuItem onClick={handleMenuClose}>
             <Typography variant="body2">
               {userStore.user?.email || 'email@example.com'}

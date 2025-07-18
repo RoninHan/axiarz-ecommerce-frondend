@@ -9,6 +9,8 @@ import { MainLayout } from '../layouts/MainLayout';
 import { useUserStore } from '../stores/StoreProvider';
 import { CategoryManagement } from '../pages/CategoryManagement';
 import { HomeProductManagement } from '../pages/HomeProductManagement';
+import { BannerManagement } from '../pages/BannerManagement';
+import { OrderManagement } from '../pages/OrderManagement';
 
 const elementMap: Record<string, React.ReactNode> = {
   Dashboard: <Dashboard />,
@@ -16,7 +18,9 @@ const elementMap: Record<string, React.ReactNode> = {
   ProductManagement: <ProductManagement />,
   Login: <Login />,
   CategoryManagement: <CategoryManagement />,
-  HomeProductManagement: <HomeProductManagement />, 
+  HomeProductManagement: <HomeProductManagement />,
+  BannerManagement: <BannerManagement />,
+  OrderManagement: <OrderManagement />
 };
 
 /**

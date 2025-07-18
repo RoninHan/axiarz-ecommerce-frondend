@@ -734,7 +734,7 @@ export const DataTable: React.FC<DataTableProps> = ({
                   />
                 </TableCell>
               )}
-              {columns.map(column => (
+              {columns.filter(col => !col.hidden).map(column => (
                 <TableCell key={column.field} style={{ width: column.width }}>
                   {column.label}
                 </TableCell>
@@ -771,7 +771,7 @@ export const DataTable: React.FC<DataTableProps> = ({
                       />
                     </TableCell>
                   )}
-                  {columns.map((column, colIdx) => (
+                  {columns.filter(col => !col.hidden).map((column) => (
                     <TableCell key={String(column.field) + '_' + row.id}>
                       {renderCell(column, row)}
                     </TableCell>
@@ -805,15 +805,21 @@ export const DataTable: React.FC<DataTableProps> = ({
 
       {/* 分页 */}
       {onPageChange && (
-        <TablePagination
-          component="div"
-          count={total}
-          page={page}
-          onPageChange={(_, newPage) => onPageChange(newPage)}
-          rowsPerPage={pageSize}
-          onRowsPerPageChange={(e) => onPageSizeChange?.(parseInt(e.target.value, 10))}
-          rowsPerPageOptions={[5, 10, 25, 50]}
-        />
+        (() => {
+          const maxPage = Math.max(0, Math.ceil(total / pageSize) - 1);
+          const safePage = Math.min(Math.max(0, page), maxPage);
+          return (
+            <TablePagination
+              component="div"
+              count={total}
+              page={safePage}
+              onPageChange={(_, newPage) => onPageChange(newPage)}
+              rowsPerPage={pageSize}
+              onRowsPerPageChange={(e) => onPageSizeChange?.(parseInt(e.target.value, 10))}
+              rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+          );
+        })()
       )}
 
       {/* 高级筛选抽屉 */}
@@ -870,11 +876,13 @@ export const DataTable: React.FC<DataTableProps> = ({
               </IconButton>
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {columns.filter(col => col.editable !== false).map((column, idx) => (
-                <Box key={column.field || idx}>
-                  {renderFormField(column)}
-                </Box>
-              ))}
+              {columns
+                .filter(col => col.editable !== false)
+                .map((column, idx) => (
+                  <Box key={column.field || idx}>
+                    {renderFormField(column)}
+                  </Box>
+                ))}
             </Box>
             <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
               <Button
@@ -898,11 +906,13 @@ export const DataTable: React.FC<DataTableProps> = ({
           </DialogTitle>
           <DialogContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-              {columns.filter(col => col.editable !== false).map((column, idx) => (
-                <Box key={column.field || idx}>
-                  {renderFormField(column)}
-                </Box>
-              ))}
+              {columns
+                .filter(col => col.editable !== false)
+                .map((column, idx) => (
+                  <Box key={column.field || idx}>
+                    {renderFormField(column)}
+                  </Box>
+                ))}
             </Box>
           </DialogContent>
           <DialogActions>

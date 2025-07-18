@@ -46,6 +46,22 @@
     "icon": "Category"
   },
   {
+    "path": "/banner",
+    "element": "BannerManagement",
+    "auth": true,
+    "menu": true,
+    "title": "橫幅管理",
+    "icon": "Category"
+  },
+  {
+    "path": "/orders",
+    "element": "OrderManagement",
+    "auth": true,
+    "menu": true,
+    "title": "订单管理",
+    "icon": "Category"
+  },
+  {
     "path": "/login",
     "element": "Login",
     "auth": false,
