@@ -215,7 +215,6 @@ export const UserManagement: React.FC = () => {
     setFilteredData(result);
   };
 
-  // 模拟API调用
   const simulateApiCall = async (action: string = '', delay: number = 1000) => {
     setLoading(true);
     const {data} = await userApi.getUsers({
@@ -234,10 +233,8 @@ export const UserManagement: React.FC = () => {
   // 添加用户
   const handleAdd = async (userData: Partial<DataItem>) => {
     try {
+      await userApi.createUser(userData);
       await simulateApiCall('添加用户');
-      const newUser = {
-        ...userData,
-      };
       
       setMessage('用户添加成功');
       setMessageType('success');
@@ -250,14 +247,8 @@ export const UserManagement: React.FC = () => {
   // 编辑用户
   const handleEdit = async (id: string | number, userData: Partial<DataItem>) => {
     try {
+      await userApi.updateUser(id.toString(), userData);
       await simulateApiCall('编辑用户');
-      setData(prev => prev.map(user => 
-        user.id === id ? { 
-          ...user, 
-          ...userData,
-          avatar: userData.username?.charAt(0).toUpperCase() || user.avatar
-        } : user
-      ));
       setMessage('用户编辑成功');
       setMessageType('success');
     } catch (error) {
@@ -269,8 +260,8 @@ export const UserManagement: React.FC = () => {
   // 删除用户
   const handleDelete = async (id: string | number) => {
     try {
+      await userApi.deleteUser(id.toString());
       await simulateApiCall('删除用户');
-      setData(prev => prev.filter(user => user.id !== id));
       setMessage('用户删除成功');
       setMessageType('success');
     } catch (error) {
@@ -282,7 +273,7 @@ export const UserManagement: React.FC = () => {
   // 批量删除用户
   const handleBulkDelete = async () => {
     try {
-      await simulateApiCall('批量删除用户');
+      await Promise.all(selectedUsers.map(id => userApi.deleteUser(id.toString())));
       setData(prev => prev.filter(user => !selectedUsers.includes(user.id)));
       setSelectedUsers([]);
       setBulkActionDialog(false);
